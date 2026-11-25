@@ -1,0 +1,16 @@
+{
+    "name": "LOGIYGames.Abilities",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ce2b22de292e0b044ba805ad0c8861d4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
