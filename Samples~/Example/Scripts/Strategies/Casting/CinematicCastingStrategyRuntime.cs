@@ -54,6 +54,7 @@ namespace LOGIYGames.Abilities
             catch
             {
                 CleanupCamera();
+                base.OnExit(ctx);
                 throw;
             }
         }
