@@ -39,7 +39,10 @@ namespace LOGIYGames.Abilities
                 _camera = Camera.main;
 
             if (_camera == null)
+            {
+                _controller.TargetingInput.Clear();
                 return;
+            }
 
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
