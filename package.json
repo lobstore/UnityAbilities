@@ -8,5 +8,12 @@
   "author": {
     "name": "LOGIYGames"
   },
+  "samples": [
+    {
+      "displayName": "Example",
+      "description": "Abilities Example usage",
+      "path": "Samples~/Example"
+    }
+  ],
   "hideInEditor": false
 }
