@@ -60,7 +60,36 @@ namespace LOGIYGames.Abilities
         {
             _elapsed += Time.deltaTime;
             if (_elapsed >= _cfg.StateDuration || (_cfg.ExitStateOnAnimationEvent && _animEvent))
-                ctx.OwnerMachine.Finish();
+                OnReleaseCompleted(ctx);
+        }
+
+        /// <summary>
+        /// Completes the current release iteration. When MaxIterations is greater than one,
+        /// starts another targeting phase before completing the ability.
+        /// Override this method to customize iteration completion; call the base implementation
+        /// on the final iteration to preserve the standard finish behavior.
+        /// </summary>
+        protected virtual void OnReleaseCompleted(AbilityContext ctx)
+        {
+            int maxIterations = Mathf.Max(1, _cfg.MaxIterations);
+            if (ctx.ReleaseIteration + 1 < maxIterations)
+            {
+                ctx.ReleaseIteration++;
+                _isRepeatTransition = true;
+                try
+                {
+                    ctx.OwnerMachine.ChangeState(
+                        new TargetingState(ctx.Ability.Data.Targeting.CreateRuntime()));
+                }
+                finally
+                {
+                    _isRepeatTransition = false;
+                }
+
+                return;
+            }
+
+            ctx.OwnerMachine.Finish();
         }
     }
 }
