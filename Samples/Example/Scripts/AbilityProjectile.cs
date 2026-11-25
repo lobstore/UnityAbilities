@@ -27,7 +27,7 @@ namespace LOGIYGames.Abilities
         private void OnCollisionEnter(Collision collision)
         {
             // Ignore the caster so the projectile cannot hit its owner immediately.
-            if (_ctx != null && collision.gameObject == _ctx.Caster)
+            if (collision.gameObject == _ctx.Caster)
                 return;
 
             OnCollided.Invoke();
