@@ -8,8 +8,10 @@ namespace LOGIYGames.Abilities
     /// </summary>
     public class SelectedTargetingRuntime : TargetingStrategyRuntime
     {
+        /// <summary>Creates a selected-target runtime using the shared targeting configuration.</summary>
         public SelectedTargetingRuntime(TargetingStrategyConfig config) : base(config) { }
 
+        /// <summary>Reads the current selected GameObject from the external targeting input object.</summary>
         protected override void UpdateTargeting(AbilityContext ctx)
         {
             GameObject selectedTarget = ctx.TargetingInput != null
