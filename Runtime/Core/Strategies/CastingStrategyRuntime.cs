@@ -16,9 +16,7 @@ namespace LOGIYGames.Abilities
             _animEvent = false;
 
             if (_cfg.StateDuration == 0)
-            {
                 return;
-            }
 
             if (_cfg.VFX != null)
                 Object.Instantiate(_cfg.VFX, ctx.Caster.transform);
@@ -36,25 +34,24 @@ namespace LOGIYGames.Abilities
         {
             _elapsed += Time.deltaTime;
             if (_elapsed >= _cfg.StateDuration || (_cfg.ExitStateOnAnimationEvent && _animEvent))
-            {
                 ctx.OwnerMachine.ChangeState(new ReleaseState(ctx.Ability.Data.Release.CreateRuntime()));
-            }
         }
 
         public void OnExit(AbilityContext ctx)
         {
-            if (ctx.Animator != null) ctx.Animator.SetBool("IsCasting", false);
+            if (ctx.Animator != null)
+                ctx.Animator.SetBool("IsCasting", false);
         }
-        public bool CanCancel(AbilityContext ctx) => false;
+
+        public bool CanCancel(AbilityContext ctx)
+            => _cfg.AllowCancel && _elapsed >= _cfg.MinTimeBeforeCancel;
 
         public void OnAnimationEvent(string eventName)
         {
-            if (eventName == _cfg.AnimationEventName) _animEvent = true;
+            if (eventName == _cfg.AnimationEventName)
+                _animEvent = true;
         }
 
-        public bool CanBeInterrupted(AbilityContext ctx)
-        {
-            return _cfg.IsInterruptible;
-        }
+        public bool CanBeInterrupted(AbilityContext ctx) => _cfg.IsInterruptible;
     }
 }
