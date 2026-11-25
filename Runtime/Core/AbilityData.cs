@@ -15,7 +15,7 @@ namespace LOGIYGames.Abilities
         /// <summary>Cooldown duration in seconds, applied when the Release state exits.</summary>
         [Min(0)] public float CooldownDuration = 0;
 
-        /// <summary>Configuration for the optional preparation phase. The current sample controller starts with this state.</summary>
+        /// <summary>Configuration for the initial Warmup phase. The sample controller always starts the ability with this state, so assign a valid config.</summary>
         public WarmupStrategyConfig Warmup;
 
         /// <summary>Configuration for selecting or calculating the ability target.</summary>
