@@ -21,7 +21,7 @@ namespace LOGIYGames.Abilities
 
         public bool IsCasting => _stateMachine != null && !_stateMachine.IsFinished;
         public AbilityState CurrentState => _stateMachine?.Current;
-        public AbilityRuntime CurrentAbility => _currentAbility;
+        public AbilityRuntime CurrentAbility => IsCasting ? _currentAbility : null;
         public bool CanCancelCurrentAbility => _stateMachine?.CanCancel ?? false;
         public bool CanInterruptCurrentAbility => _stateMachine?.CanBeInterrupted ?? false;
 
