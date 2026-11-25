@@ -14,6 +14,7 @@ namespace LOGIYGames.Abilities
         /// <summary>Whether to parent the spawned camera prefab to the caster transform.</summary>
         public bool ParentToCaster = true;
 
+        /// <summary>Creates a cinematic Casting runtime for one ability activation.</summary>
         public override IAbilityStateStrategy CreateRuntime()
             => new CinematicCastingStrategyRuntime(this);
     }
