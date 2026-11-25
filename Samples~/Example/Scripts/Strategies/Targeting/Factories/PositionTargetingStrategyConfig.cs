@@ -8,6 +8,7 @@ namespace LOGIYGames.Abilities
     [CreateAssetMenu(menuName = "Abilities/Strategies/Targeting/Position")]
     public class PositionTargetingStrategyConfig : TargetingStrategyConfig
     {
+        /// <summary>Creates a position-targeting runtime for one ability activation.</summary>
         public override IAbilityStateStrategy CreateRuntime() => new PositionTargetingRuntime(this);
     }
 }
