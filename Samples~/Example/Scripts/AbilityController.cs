@@ -25,6 +25,20 @@ namespace LOGIYGames.Abilities
         /// </summary>
         public AbilityTargetingInput TargetingInput { get; } = new();
 
+        /// <summary>
+        /// Enables or disables the sample camera-to-world targeting adapter.
+        /// Set to false when an AI, network client, or scripted system supplies TargetingInput.
+        /// </summary>
+        public bool UseCameraTargetingInput
+        {
+            get => _useCameraTargetingInput;
+            set
+            {
+                _useCameraTargetingInput = value;
+                ConfigureTargetingInputProvider();
+            }
+        }
+
         private AbilityStateMachine _stateMachine;
         private AnimationEventReceiver _animReceiver;
 
@@ -55,6 +69,11 @@ namespace LOGIYGames.Abilities
             if (_animReceiver != null)
                 _animReceiver.OnAnimationEvent += HandleAnimationEvent;
 
+            ConfigureTargetingInputProvider();
+        }
+
+        private void ConfigureTargetingInputProvider()
+        {
             var inputProvider = GetComponent<CameraPositionTargetingInputProvider>();
             if (_useCameraTargetingInput)
             {
@@ -67,6 +86,7 @@ namespace LOGIYGames.Abilities
             else if (inputProvider != null)
             {
                 inputProvider.enabled = false;
+                TargetingInput.Clear();
             }
         }
 
