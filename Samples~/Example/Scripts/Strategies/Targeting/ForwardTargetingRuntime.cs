@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace LOGIYGames.Abilities
@@ -23,16 +24,26 @@ namespace LOGIYGames.Abilities
             Vector3 direction = ctx.Caster.transform.forward.normalized;
             Ray ray = new Ray(origin.position, direction);
 
-            if (Physics.Raycast(ray, out RaycastHit hit, _forwardConfig.RaycastDistance, _forwardConfig.TargetLayers))
+            RaycastHit[] hits = Physics.RaycastAll(
+                ray,
+                _forwardConfig.RaycastDistance,
+                _forwardConfig.TargetLayers);
+
+            Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (RaycastHit hit in hits)
             {
+                // Ignore every collider belonging to the caster hierarchy.
+                if (hit.collider.transform.root == ctx.Caster.transform.root)
+                    continue;
+
                 ctx.Target = hit.collider.gameObject;
                 ctx.TargetPoint = hit.point;
+                return;
             }
-            else
-            {
-                ctx.Target = null;
-                ctx.TargetPoint = ray.GetPoint(_forwardConfig.RaycastDistance);
-            }
+
+            ctx.Target = null;
+            ctx.TargetPoint = ray.GetPoint(_forwardConfig.RaycastDistance);
         }
     }
 }
