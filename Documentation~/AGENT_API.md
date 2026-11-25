@@ -1,6 +1,8 @@
-# Agent API Reference
+# Agent API Reference — Runtime Integration
 
-This file is a compact contract for AI agents, gameplay planners, and code-generation agents integrating with LOGIYGames Abilities.
+> **Scope:** This document is for agents that need to inspect and control abilities that have already been implemented. It is not the guide for creating new abilities. For ability authoring, read [Ability Development Guide (EN)](AGENT_DEVELOPMENT.md) or [Руководство по разработке способностей (RU)](AGENT_DEVELOPMENT_RU.md).
+
+This is a compact contract for AI gameplay agents, planners, and runtime integration code using LOGIYGames Abilities.
 
 ## Operating model
 
@@ -41,17 +43,7 @@ public bool AgentRequestAbility(AbilityController controller, AbilityRuntime req
     if (!controller.IsCasting)
         return controller.TryActivateAbility(requested);
 
-    // The agent wants to replace what is currently running.
     return controller.TryActivateAbility(requested, interruptCurrent: true);
-}
-```
-
-Example: cancel only when allowed:
-
-```csharp
-if (controller.IsCasting && controller.CanCancelCurrentAbility)
-{
-    bool stopped = controller.TryCancelCurrentAbility();
 }
 ```
 
@@ -65,15 +57,10 @@ All state config assets derive from `AbilityStateStrategyConfig`:
 
 These flags are independent and default to `false`. Policy decisions can also be specialized by overriding `CanCancel(AbilityContext)` or `CanBeInterrupted(AbilityContext)` in a custom strategy/state.
 
-## Safety rules for agents
+## Runtime safety rules
 
 - Prefer `TryCancelCurrentAbility` and `TryInterrupt`; do not call `AbilityStateMachine.Finish()` to bypass gameplay policy.
 - A `false` return means the requested transition did not happen.
 - Do not assume interruption cleans up projectiles, spawned objects, network state, or other external side effects. Those are the owning strategy's responsibility, usually in `OnExit`.
 - The Release state's `OnExit` applies cooldown, including when the state exits due to cancellation/interruption.
 - Read the actual capability at decision time. It can change as `MinTimeBeforeCancel` elapses.
-
-## Related documentation
-
-- [English guide](en/README.md)
-- [Russian guide](ru/README.md)
