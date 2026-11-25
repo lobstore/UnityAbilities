@@ -75,12 +75,17 @@ namespace LOGIYGames.Abilities
             if (IsFinished)
                 return;
 
-            // Mark the machine as finished before invoking user strategy code.
-            // This keeps Finish idempotent if OnExit causes another lifecycle call.
             IsFinished = true;
             var previous = _current;
-            _current = null;
-            previous?.Exit(_ctx);
+            try
+            {
+                // Keep Current available while the exiting strategy performs cleanup.
+                previous?.Exit(_ctx);
+            }
+            finally
+            {
+                _current = null;
+            }
         }
     }
 }
