@@ -24,7 +24,6 @@ namespace LOGIYGames.Abilities
             {
                 ctx.Animator.SetBool("IsTargeting", true);
                 ctx.Animator.CrossFadeInFixedTime(_cfg.AnimationData.AnimationName, _cfg.AnimationData.Crossfade);
-
             }
         }
 
@@ -40,15 +39,13 @@ namespace LOGIYGames.Abilities
 
         public virtual void OnExit(AbilityContext ctx)
         {
-            if (ctx.Animator != null) ctx.Animator.SetBool("IsTargeting", false);
+            if (ctx.Animator != null)
+                ctx.Animator.SetBool("IsTargeting", false);
         }
 
         public virtual bool CanCancel(AbilityContext ctx)
             => _cfg.AllowCancel && _elapsed >= _cfg.MinTimeBeforeCancel;
 
-        public bool CanBeInterrupted(AbilityContext ctx)
-        {
-            return _cfg.IsInterruptible;
-        }
+        public bool CanBeInterrupted(AbilityContext ctx) => _cfg.IsInterruptible;
     }
 }
