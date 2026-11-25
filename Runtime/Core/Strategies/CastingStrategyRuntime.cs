@@ -10,7 +10,7 @@ namespace LOGIYGames.Abilities
 
         public CastingStrategyRuntime(CastingStrategyConfig cfg) => _cfg = cfg;
 
-        public void OnEnter(AbilityContext ctx)
+        public virtual void OnEnter(AbilityContext ctx)
         {
             _elapsed = 0f;
             _animEvent = false;
@@ -37,7 +37,7 @@ namespace LOGIYGames.Abilities
                 ctx.OwnerMachine.ChangeState(new ReleaseState(ctx.Ability.Data.Release.CreateRuntime()));
         }
 
-        public void OnExit(AbilityContext ctx)
+        public virtual void OnExit(AbilityContext ctx)
         {
             if (ctx.Animator != null)
                 ctx.Animator.SetBool("IsCasting", false);
