@@ -251,3 +251,8 @@ When asked to implement an ability, provide:
 5. Validation results, clearly separating completed checks from checks that could not be run.
 
 Do not stop after writing a controller call to activate an existing `AbilityRuntime`: that is integration/usage, not ability implementation.
+
+
+## XML API documentation
+
+When adding or changing public C# API, write XML documentation comments directly above every public class, constructor, method, property, and public field. For methods with parameters or return values, include `<param>` and `<returns>` tags. Document protected extension points as well, especially virtual methods intended for subclassing. Explain lifecycle timing, state transitions, side effects, nullability, and cancellation/cooldown behavior where relevant. Keep comments aligned with the actual implementation; do not document planned behavior as if it already exists.
