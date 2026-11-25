@@ -16,6 +16,15 @@ namespace LOGIYGames.Abilities
         public Animator Animator;
         public Transform CastOrigin;
 
+        [Header("Targeting Input")]
+        [SerializeField] private bool _useCameraTargetingInput = true;
+
+        /// <summary>
+        /// Mutable targeting input shared with the active ability context.
+        /// AI and network systems can write to this object instead of using the camera input provider.
+        /// </summary>
+        public AbilityTargetingInput TargetingInput { get; } = new();
+
         private AbilityStateMachine _stateMachine;
         private AnimationEventReceiver _animReceiver;
 
@@ -45,6 +54,15 @@ namespace LOGIYGames.Abilities
             _animReceiver = GetComponent<AnimationEventReceiver>();
             if (_animReceiver != null)
                 _animReceiver.OnAnimationEvent += HandleAnimationEvent;
+
+            if (_useCameraTargetingInput)
+            {
+                var inputProvider = GetComponent<CameraPositionTargetingInputProvider>();
+                if (inputProvider == null)
+                    inputProvider = gameObject.AddComponent<CameraPositionTargetingInputProvider>();
+
+                inputProvider.Initialize(this);
+            }
         }
 
         private void OnDestroy()
@@ -122,6 +140,7 @@ namespace LOGIYGames.Abilities
                 Animator = Animator,
                 CastOrigin = CastOrigin,
                 Ability = _currentAbility,
+                TargetingInput = TargetingInput,
             };
 
             _stateMachine = new AbilityStateMachine(ctx);
