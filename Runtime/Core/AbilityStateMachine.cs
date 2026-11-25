@@ -56,7 +56,7 @@ namespace LOGIYGames.Abilities
         /// <summary>
         /// Updates the active state once.
         /// </summary>
-        /// <param name="deltaTime">Frame time in seconds. Current built-in strategies read <see cref="UnityEngine.Time.deltaTime"/> directly.</param>
+        /// <param name="deltaTime">Frame time in seconds. This value is currently not forwarded to strategies; built-in strategies read <see cref="UnityEngine.Time.deltaTime"/> directly.</param>
         public void Update(float deltaTime)
         {
             if (IsFinished || _current == null)
