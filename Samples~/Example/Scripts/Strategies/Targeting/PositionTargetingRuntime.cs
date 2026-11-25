@@ -9,8 +9,10 @@ namespace LOGIYGames.Abilities
     /// </summary>
     public class PositionTargetingRuntime : TargetingStrategyRuntime
     {
+        /// <summary>Creates a position-targeting runtime using the shared targeting configuration.</summary>
         public PositionTargetingRuntime(TargetingStrategyConfig cfg) : base(cfg) { }
 
+        /// <summary>Copies the externally supplied target and world position into the ability context.</summary>
         protected override void UpdateTargeting(AbilityContext ctx)
         {
             if (ctx.TargetingInput == null)
