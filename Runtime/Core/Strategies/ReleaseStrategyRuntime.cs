@@ -7,6 +7,7 @@ namespace LOGIYGames.Abilities
         private readonly ReleaseStrategyConfig _cfg;
         private float _elapsed;
         private bool _animEvent;
+        private bool _isRepeatTransition;
 
         public ReleaseStrategyRuntime(ReleaseStrategyConfig cfg)
         {
@@ -45,8 +46,13 @@ namespace LOGIYGames.Abilities
             if (ctx.Animator != null)
                 ctx.Animator.SetBool("IsReleasing", false);
 
-            // Cooldown is applied when the release phase exits, including cancellation
-            // or interruption after the ability has reached this phase.
+            // A loop transition is part of the same ability activation, not its completion.
+            // Do not start cooldown between repeated releases.
+            if (_isRepeatTransition)
+                return;
+
+            // Cooldown is applied on final completion, cancellation, or interruption
+            // after the ability has reached the Release phase.
             ctx.Ability.SetOnCooldown();
         }
 
