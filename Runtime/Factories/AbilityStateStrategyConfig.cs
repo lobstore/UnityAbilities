@@ -2,6 +2,10 @@ using UnityEngine;
 
 namespace LOGIYGames.Abilities
 {
+    /// <summary>
+    /// Shared configuration for an ability state runtime strategy.
+    /// Cancellation and interruption are configured independently for every state.
+    /// </summary>
     public abstract class AbilityStateStrategyConfig : ScriptableObject
     {
         public AbilityAnimationData AnimationData;
