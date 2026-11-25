@@ -55,13 +55,18 @@ namespace LOGIYGames.Abilities
             if (_animReceiver != null)
                 _animReceiver.OnAnimationEvent += HandleAnimationEvent;
 
+            var inputProvider = GetComponent<CameraPositionTargetingInputProvider>();
             if (_useCameraTargetingInput)
             {
-                var inputProvider = GetComponent<CameraPositionTargetingInputProvider>();
                 if (inputProvider == null)
                     inputProvider = gameObject.AddComponent<CameraPositionTargetingInputProvider>();
 
+                inputProvider.enabled = true;
                 inputProvider.Initialize(this);
+            }
+            else if (inputProvider != null)
+            {
+                inputProvider.enabled = false;
             }
         }
 
