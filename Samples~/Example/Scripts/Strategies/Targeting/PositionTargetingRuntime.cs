@@ -22,6 +22,8 @@ namespace LOGIYGames.Abilities
                 ctx.TargetPoint = ctx.TargetingInput.WorldPosition;
             else if (ctx.Target != null)
                 ctx.TargetPoint = ctx.Target.transform.position;
+            else
+                ctx.TargetPoint = Vector3.zero;
         }
     }
 }
