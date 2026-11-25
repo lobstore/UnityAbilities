@@ -48,14 +48,19 @@ namespace LOGIYGames.Abilities
 
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out RaycastHit hit, _maxDistance, _targetLayers))
+            RaycastHit[] hits = Physics.RaycastAll(ray, _maxDistance, _targetLayers);
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (RaycastHit hit in hits)
             {
+                if (hit.collider.transform.root == _controller.transform.root)
+                    continue;
+
                 _controller.TargetingInput.SetPosition(hit.point, hit.collider.gameObject);
+                return;
             }
-            else
-            {
-                _controller.TargetingInput.SetPosition(ray.GetPoint(_maxDistance));
-            }
+
+            _controller.TargetingInput.SetPosition(ray.GetPoint(_maxDistance));
         }
     }
 }
