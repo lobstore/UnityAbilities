@@ -117,3 +117,8 @@ bool started = _controller.TryActivateAbility(next, interruptCurrent: true);
 ## Требования
 
 - Unity 2022.3 или новее.
+
+
+## Для coding agents
+
+Для проектирования и реализации новых способностей используйте [руководство по разработке способностей](../AGENT_DEVELOPMENT_RU.md). [Runtime Agent API](../AGENT_API.md) предназначен для управления уже существующими способностями.
