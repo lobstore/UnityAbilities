@@ -1,26 +1,48 @@
 namespace LOGIYGames.Abilities
 {
+    /// <summary>
+    /// Controls the lifecycle of one ability activation, including state transitions,
+    /// policy-checked cancellation, interruption, and completion.
+    /// </summary>
     public class AbilityStateMachine
     {
         private AbilityState _current;
         private readonly AbilityContext _ctx;
 
+        /// <summary>
+        /// Gets whether this ability activation has finished.
+        /// </summary>
         public bool IsFinished { get; private set; }
+
+        /// <summary>
+        /// Gets the active state, or <see langword="null"/> when no state is active.
+        /// </summary>
         public AbilityState Current => _current;
 
         /// <summary>
-        /// True when the active state currently allows cancellation.
+        /// Gets whether the active state currently allows cancellation.
+        /// The result can change while a state is active, for example when its
+        /// minimum cancellation delay has elapsed.
         /// </summary>
         public bool CanCancel => !IsFinished && _current != null && _current.CanCancel(_ctx);
 
         /// <summary>
-        /// True when the active state currently allows interruption by another ability.
+        /// Gets whether the active state currently allows another ability to interrupt it.
         /// </summary>
         public bool CanBeInterrupted
             => !IsFinished && _current != null && _current.CanBeInterrupted(_ctx);
 
+        /// <summary>
+        /// Creates a state machine for a single ability activation.
+        /// </summary>
+        /// <param name="ctx">Context shared by all states in this ability activation.</param>
         public AbilityStateMachine(AbilityContext ctx) => _ctx = ctx;
 
+        /// <summary>
+        /// Exits the current state and enters the supplied state.
+        /// Calls are ignored after the machine has finished.
+        /// </summary>
+        /// <param name="next">State to enter. Passing <see langword="null"/> leaves the machine without an active state.</param>
         public void ChangeState(AbilityState next)
         {
             if (IsFinished)
@@ -31,6 +53,10 @@ namespace LOGIYGames.Abilities
             _current?.Enter(_ctx);
         }
 
+        /// <summary>
+        /// Updates the active state once.
+        /// </summary>
+        /// <param name="deltaTime">Frame time in seconds. Current built-in strategies read <see cref="UnityEngine.Time.deltaTime"/> directly.</param>
         public void Update(float deltaTime)
         {
             if (IsFinished || _current == null)
@@ -40,9 +66,9 @@ namespace LOGIYGames.Abilities
         }
 
         /// <summary>
-        /// Requests a regular cancellation. The active state's CanCancel policy is respected.
+        /// Requests cancellation of the current ability, subject to the active state's policy.
         /// </summary>
-        /// <returns>True when the ability was cancelled.</returns>
+        /// <returns><see langword="true"/> if the ability was cancelled; otherwise, <see langword="false"/> and the state remains active.</returns>
         public bool TryCancel()
         {
             if (!CanCancel)
@@ -53,10 +79,10 @@ namespace LOGIYGames.Abilities
         }
 
         /// <summary>
-        /// Requests interruption by another ability. The active state's
-        /// CanBeInterrupted policy is respected.
+        /// Requests interruption of the current ability so another ability can take over,
+        /// subject to the active state's interruption policy.
         /// </summary>
-        /// <returns>True when the ability was interrupted.</returns>
+        /// <returns><see langword="true"/> if the ability was interrupted; otherwise, <see langword="false"/> and the state remains active.</returns>
         public bool TryInterrupt()
         {
             if (!CanBeInterrupted)
@@ -67,8 +93,9 @@ namespace LOGIYGames.Abilities
         }
 
         /// <summary>
-        /// Immediately finishes the ability regardless of the active state's policies.
-        /// Use TryCancel or TryInterrupt for policy-controlled termination.
+        /// Immediately finishes this ability regardless of cancellation or interruption policies.
+        /// The active state's <see cref="AbilityState.Exit"/> callback is invoked at most once.
+        /// Prefer <see cref="TryCancel"/> or <see cref="TryInterrupt"/> for gameplay requests.
         /// </summary>
         public void Finish()
         {
