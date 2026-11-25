@@ -40,31 +40,63 @@ namespace LOGIYGames.Abilities
                 parent);
 
             _cameraBinders.Clear();
-            foreach (MonoBehaviour component in _cameraInstance.GetComponentsInChildren<MonoBehaviour>(true))
+            try
             {
-                if (component is IAbilityCinematicCameraBinder binder)
+                foreach (MonoBehaviour component in _cameraInstance.GetComponentsInChildren<MonoBehaviour>(true))
                 {
-                    binder.Bind(ctx);
-                    _cameraBinders.Add(binder);
+                    if (component is IAbilityCinematicCameraBinder binder)
+                    {
+                        _cameraBinders.Add(binder);
+                        binder.Bind(ctx);
+                    }
                 }
+            }
+            catch
+            {
+                CleanupCamera();
+                throw;
             }
         }
 
         /// <summary>Unbinds and destroys the cinematic camera instance, then exits the base Casting phase.</summary>
         public override void OnExit(AbilityContext ctx)
         {
-            for (int i = _cameraBinders.Count - 1; i >= 0; i--)
-                _cameraBinders[i].Unbind();
-
-            _cameraBinders.Clear();
-
-            if (_cameraInstance != null)
+            try
             {
-                Object.Destroy(_cameraInstance);
-                _cameraInstance = null;
+                CleanupCamera();
             }
+            finally
+            {
+                base.OnExit(ctx);
+            }
+        }
 
-            base.OnExit(ctx);
+        private void CleanupCamera()
+        {
+            try
+            {
+                for (int i = _cameraBinders.Count - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        _cameraBinders[i].Unbind();
+                    }
+                    catch (System.Exception exception)
+                    {
+                        Debug.LogException(exception);
+                    }
+                }
+            }
+            finally
+            {
+                _cameraBinders.Clear();
+
+                if (_cameraInstance != null)
+                {
+                    Object.Destroy(_cameraInstance);
+                    _cameraInstance = null;
+                }
+            }
         }
     }
 }
