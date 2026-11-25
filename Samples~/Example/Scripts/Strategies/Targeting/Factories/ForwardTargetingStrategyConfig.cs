@@ -11,6 +11,7 @@ namespace LOGIYGames.Abilities
         [Min(0f)] public float RaycastDistance = 50f;
         public LayerMask TargetLayers = ~0;
 
+        /// <summary>Creates a forward-targeting runtime for one ability activation.</summary>
         public override IAbilityStateStrategy CreateRuntime() => new ForwardTargetingRuntime(this);
     }
 }
