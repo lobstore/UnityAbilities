@@ -14,11 +14,13 @@ namespace LOGIYGames.Abilities
         private readonly List<IAbilityCinematicCameraBinder> _cameraBinders = new();
         private GameObject _cameraInstance;
 
+        /// <summary>Creates a casting runtime that owns a temporary Cinemachine prefab instance.</summary>
         public CinematicCastingStrategyRuntime(CinematicCastingStrategyConfig config) : base(config)
         {
             _cinematicConfig = config;
         }
 
+        /// <summary>Starts normal Casting behavior and instantiates/binds the cinematic camera prefab.</summary>
         public override void OnEnter(AbilityContext ctx)
         {
             base.OnEnter(ctx);
@@ -48,6 +50,7 @@ namespace LOGIYGames.Abilities
             }
         }
 
+        /// <summary>Unbinds and destroys the cinematic camera instance, then exits the base Casting phase.</summary>
         public override void OnExit(AbilityContext ctx)
         {
             for (int i = _cameraBinders.Count - 1; i >= 0; i--)
