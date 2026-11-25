@@ -17,8 +17,9 @@ namespace LOGIYGames.Abilities
                 : null;
 
             ctx.Target = selectedTarget;
-            if (selectedTarget != null)
-                ctx.TargetPoint = selectedTarget.transform.position;
+            ctx.TargetPoint = selectedTarget != null
+                ? selectedTarget.transform.position
+                : ctx.Caster.transform.position;
         }
     }
 }
