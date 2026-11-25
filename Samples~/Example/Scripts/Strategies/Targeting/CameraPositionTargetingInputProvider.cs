@@ -14,6 +14,8 @@ namespace LOGIYGames.Abilities
         [SerializeField, Min(0f)] private float _maxDistance = 50f;
         [SerializeField] private LayerMask _targetLayers = ~0;
 
+        /// <summary>Connects this camera adapter to the controller whose targeting input it will populate.</summary>
+        /// <param name="controller">Controller that owns the shared targeting input data.</param>
         public void Initialize(AbilityController controller)
         {
             _controller = controller;
