@@ -24,7 +24,6 @@ namespace LOGIYGames.Abilities
                 ctx.Animator.SetBool("IsWarmuping", true);
                 ctx.Animator.CrossFadeInFixedTime(_cfg.AnimationData.AnimationName, _cfg.AnimationData.Crossfade);
             }
-
         }
 
         public void OnUpdate(AbilityContext ctx)
@@ -39,16 +38,16 @@ namespace LOGIYGames.Abilities
             if (ctx.Animator != null)
                 ctx.Animator.SetBool("IsWarmuping", false);
         }
-        public bool CanCancel(AbilityContext ctx) => false;
+
+        public bool CanCancel(AbilityContext ctx)
+            => _cfg.AllowCancel && _elapsed >= _cfg.MinTimeBeforeCancel;
 
         public void OnAnimationEvent(string eventName)
         {
-            if (eventName == _cfg.AnimationEventName) _animEvent = true;
+            if (eventName == _cfg.AnimationEventName)
+                _animEvent = true;
         }
 
-        public bool CanBeInterrupted(AbilityContext ctx)
-        {
-            return _cfg.IsInterruptible;
-        }
+        public bool CanBeInterrupted(AbilityContext ctx) => _cfg.IsInterruptible;
     }
 }

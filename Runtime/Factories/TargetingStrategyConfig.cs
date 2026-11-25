@@ -6,8 +6,9 @@ namespace LOGIYGames.Abilities
     public class TargetingStrategyConfig : AbilityStateStrategyConfig
     {
         public float MaxTargetingTime = 2f;
-        public bool AllowCancel = true;
-        public float MinTimeBeforeCancel = 0.3f;
+
+        // AllowCancel and MinTimeBeforeCancel are inherited from
+        // AbilityStateStrategyConfig so every state uses the same policy.
 
         public override IAbilityStateStrategy CreateRuntime() => new TargetingStrategyRuntime(this);
     }

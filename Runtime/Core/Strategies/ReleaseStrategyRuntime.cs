@@ -7,31 +7,28 @@ namespace LOGIYGames.Abilities
         private readonly ReleaseStrategyConfig _cfg;
         private float _elapsed;
         private bool _animEvent;
+
         public ReleaseStrategyRuntime(ReleaseStrategyConfig cfg)
         {
             _cfg = cfg;
         }
 
-        public bool CanBeInterrupted(AbilityContext ctx)
-        {
-            return _cfg.IsInterruptible;
-        }
+        public bool CanBeInterrupted(AbilityContext ctx) => _cfg.IsInterruptible;
 
         public virtual bool CanCancel(AbilityContext ctx)
-        {
-            return false;
-        }
+            => _cfg.AllowCancel && _elapsed >= _cfg.MinTimeBeforeCancel;
 
         public void OnAnimationEvent(string eventName)
         {
             if (eventName == _cfg.AnimationEventName)
-            {
                 _animEvent = true;
-            }
         }
 
         public virtual void OnEnter(AbilityContext ctx)
         {
+            _elapsed = 0f;
+            _animEvent = false;
+
             if (_cfg.VFX != null)
                 Object.Instantiate(_cfg.VFX, ctx.Caster.transform);
             if (_cfg.SFX != null)
@@ -45,7 +42,11 @@ namespace LOGIYGames.Abilities
 
         public virtual void OnExit(AbilityContext ctx)
         {
-            if (ctx.Animator != null) ctx.Animator.SetBool("IsReleasing", false);
+            if (ctx.Animator != null)
+                ctx.Animator.SetBool("IsReleasing", false);
+
+            // Cooldown is applied when the release phase exits, including cancellation
+            // or interruption after the ability has reached this phase.
             ctx.Ability.SetOnCooldown();
         }
 
@@ -53,9 +54,7 @@ namespace LOGIYGames.Abilities
         {
             _elapsed += Time.deltaTime;
             if (_elapsed >= _cfg.StateDuration || (_cfg.ExitStateOnAnimationEvent && _animEvent))
-            {
                 ctx.OwnerMachine.Finish();
-            }
         }
     }
 }
