@@ -17,7 +17,7 @@ namespace LOGIYGames.Abilities
 
         /// <summary>
         /// Updates the ability target from the mouse ray. When no collider is hit,
-        /// uses the point at the configured maximum ray distance when no collider is hit.
+        /// uses a fallback point at the configured maximum ray distance.
         /// </summary>
         /// <param name="ctx">Shared context whose Target and TargetPoint values are updated.</param>
         protected override void UpdateTargeting(AbilityContext ctx)
