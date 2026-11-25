@@ -117,3 +117,8 @@ Cancellation settings have been promoted to `AbilityStateStrategyConfig`, so eve
 ## Requirements
 
 - Unity 2022.3 or later.
+
+
+## For coding agents
+
+To design and implement new abilities, read the [Ability Development Guide](../AGENT_DEVELOPMENT.md). The [Runtime Agent API](../AGENT_API.md) is for controlling abilities that already exist.
