@@ -2,10 +2,14 @@
 
 A configurable state-based abilities system for Unity 2022.3+.
 
-- [English documentation](Documentation~/en/README.md)
-- [Документация на русском](Documentation~/ru/README.md)
-- [Agent API reference](Documentation~/AGENT_API.md)
-- [Instructions for coding agents](AGENTS.md)
+## Documentation
+
+- [English user guide](Documentation~/en/README.md)
+- [Руководство пользователя на русском](Documentation~/ru/README.md)
+- [Ability development guide for coding agents (EN)](Documentation~/AGENT_DEVELOPMENT.md)
+- [Руководство для coding agents по разработке способностей (RU)](Documentation~/AGENT_DEVELOPMENT_RU.md)
+- [Runtime Agent API reference](Documentation~/AGENT_API.md)
+- [Repository instructions for coding agents](AGENTS.md)
 
 ## Quick start
 
