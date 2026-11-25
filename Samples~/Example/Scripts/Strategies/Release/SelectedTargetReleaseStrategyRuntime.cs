@@ -10,11 +10,13 @@ namespace LOGIYGames.Abilities
     {
         private readonly SelectedTargetReleaseStrategyConfig _config;
 
+        /// <summary>Creates a release runtime configured to invoke target effect receivers.</summary>
         public SelectedTargetReleaseStrategyRuntime(SelectedTargetReleaseStrategyConfig config) : base(config)
         {
             _config = config;
         }
 
+        /// <summary>Runs the base release setup and applies the ability to receivers found on the selected target.</summary>
         public override void OnEnter(AbilityContext ctx)
         {
             base.OnEnter(ctx);
