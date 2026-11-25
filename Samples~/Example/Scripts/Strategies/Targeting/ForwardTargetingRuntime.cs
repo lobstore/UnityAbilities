@@ -10,11 +10,13 @@ namespace LOGIYGames.Abilities
     {
         private readonly ForwardTargetingStrategyConfig _forwardConfig;
 
+        /// <summary>Creates a forward-targeting runtime using the supplied raycast settings.</summary>
         public ForwardTargetingRuntime(ForwardTargetingStrategyConfig config) : base(config)
         {
             _forwardConfig = config;
         }
 
+        /// <summary>Raycasts along the caster's forward vector and updates Target/TargetPoint.</summary>
         protected override void UpdateTargeting(AbilityContext ctx)
         {
             Transform origin = ctx.CastOrigin != null ? ctx.CastOrigin : ctx.Caster.transform;
