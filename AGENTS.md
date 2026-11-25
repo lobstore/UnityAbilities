@@ -40,3 +40,10 @@ These guides explain the architecture, phase selection, ScriptableObject configs
 - Clean up owned resources and restore Animator state in `OnExit`.
 - Keep `CanCancel` and `CanBeInterrupted` side-effect free.
 - Do not claim that Unity compilation or Play Mode tests ran unless they actually ran.
+
+
+## XML API documentation
+- Add XML `<summary>` comments to every public class, constructor, method, property, and field.
+- Add `<param>` and `<returns>` tags to methods when applicable.
+- Document protected/virtual extension points and lifecycle callbacks.
+- Describe actual timing, transitions, side effects, null behavior, and cooldown semantics. Never claim that a value is consumed when the current implementation does not consume it.
