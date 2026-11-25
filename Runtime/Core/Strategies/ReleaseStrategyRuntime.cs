@@ -75,6 +75,9 @@ namespace LOGIYGames.Abilities
             if (ctx.ReleaseIteration + 1 < maxIterations)
             {
                 ctx.ReleaseIteration++;
+                // The ability has already released at least once. Keep cooldown active
+                // even if it is cancelled during the next Targeting/Casting iteration.
+                ctx.Ability.SetOnCooldown();
                 _isRepeatTransition = true;
                 try
                 {
