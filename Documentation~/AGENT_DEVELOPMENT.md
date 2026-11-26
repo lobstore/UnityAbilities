@@ -49,6 +49,8 @@ Each `AbilityData` field has a phase-specific type. A custom config must inherit
 
 A custom config normally adds serialized parameters and overrides `CreateRuntime()`. Keep runtime-only data (elapsed time, selected target caches, spawned object handles, animation-event flags) in the runtime strategy, not in the ScriptableObject. `CreateRuntime()` must return a fresh instance for every ability activation.
 
+All built-in phase configs inherit the common `CinemachinePrefab` and `ParentToCaster` fields. Assign any camera-rig prefab to `CinemachinePrefab`: a Cinemachine Virtual Camera, Cinemachine Camera, Dolly rig, or a custom composition. The rig is instantiated on phase `OnEnter` and destroyed on `OnExit`. When `ParentToCaster` is enabled, the prefab is parented to the caster while preserving its authored local offset and rotation. Assign a camera prefab to the Targeting config to use a dedicated aiming view. The runtime has no dependency on a specific Cinemachine version; implement `IAbilityCinematicCameraBinder` when Follow/LookAt or target bindings need to be configured at runtime.
+
 ### Example: custom Targeting phase
 
 Config:
@@ -123,7 +125,7 @@ This example inherits the built-in targeting lifecycle and only replaces target 
 
 ### Implementing Warmup or Casting from scratch
 
-The existing `WarmupStrategyRuntime` and `CastingStrategyRuntime` implement `IAbilityStateStrategy`, but their lifecycle methods are not virtual. For custom behavior in those phases, create a config deriving from `WarmupStrategyConfig` or `CastingStrategyConfig`, then return a custom runtime that implements `IAbilityStateStrategy` (and `IAnimationEventSink` when animation events are needed). Do not hide non-virtual methods with `new` and expect the state machine to call them polymorphically.
+`WarmupStrategyRuntime` and `CastingStrategyRuntime` expose virtual lifecycle methods. When deriving from either class, call `base.OnEnter(ctx)` and `base.OnExit(ctx)` to preserve shared camera creation/cleanup, standard effects, and Animator flags. For a fully independent implementation, return a runtime that implements `IAbilityStateStrategy` (and `IAnimationEventSink` when animation events are needed); that implementation owns its camera resources itself.
 
 ### Implementing Release
 
@@ -135,9 +137,9 @@ Implement every strategy method deliberately:
 
 | Method | Responsibility |
 | --- | --- |
-| `OnEnter(ctx)` | Reset per-activation fields, cache references, start animation/VFX/audio, subscribe to owned events if needed. |
+| `OnEnter(ctx)` | Reset per-activation fields, cache references, start animation/VFX/audio, instantiate the configured camera rig, and subscribe to owned events if needed. |
 | `OnUpdate(ctx)` | Advance timers and ability logic; request a state transition when this phase is complete. |
-| `OnExit(ctx)` | Stop animation flags, unsubscribe, release temporary resources, and clean up objects owned by this phase. |
+| `OnExit(ctx)` | Stop animation flags, unsubscribe, release temporary resources, and clean up objects owned by this phase, including the temporary camera rig. |
 | `CanCancel(ctx)` | Return whether a cancellation request is currently allowed. Keep it side-effect free. |
 | `CanBeInterrupted(ctx)` | Return whether another ability may replace this phase. Keep it side-effect free. |
 
@@ -226,7 +228,7 @@ Before reporting an ability as implemented:
 
 - [ ] The ability's expected gameplay behavior and phase responsibilities are written down.
 - [ ] Each custom config inherits from the correct phase config type.
-- [ ] Every `CreateRuntime()` returns a new runtime instance.
+- [ ] Every `CreateRuntime()` returns a fresh runtime instance.
 - [ ] Runtime fields and animation-event flags reset on every `OnEnter`.
 - [ ] All required phase configs are assigned in the `AbilityData` asset.
 - [ ] Cancellation and interruption are configured independently for every phase.
