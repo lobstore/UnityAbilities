@@ -16,18 +16,13 @@ namespace LOGIYGames.Abilities
         public Animator Animator;
         public Transform CastOrigin;
 
-        [Header("Targeting Input")]
+        [Header("Targeting Provider")]
         [SerializeField] private bool _useCameraTargetingInput = true;
 
         /// <summary>
-        /// Mutable targeting input shared with the active ability context.
-        /// AI and network systems can write to this object instead of using the camera input provider.
-        /// </summary>
-        public AbilityTargetingInput TargetingInput { get; } = new();
-
-        /// <summary>
         /// Enables or disables the sample camera-to-world targeting adapter.
-        /// Set to false when an AI, network client, or scripted system supplies TargetingInput.
+        /// Set to false when an AI, network client, or scripted system writes to
+        /// <see cref="CurrentContext"/>.Target and TargetPoint directly.
         /// </summary>
         public bool UseCameraTargetingInput
         {
@@ -40,10 +35,15 @@ namespace LOGIYGames.Abilities
         }
 
         private AbilityStateMachine _stateMachine;
+        private AbilityContext _abilityContext;
         private AnimationEventReceiver _animReceiver;
 
         public bool IsCasting => _stateMachine != null && !_stateMachine.IsFinished;
         public AbilityState CurrentState => _stateMachine?.Current;
+
+        /// <summary>Gets the active ability context so input sources can update Target and TargetPoint.</summary>
+        public AbilityContext CurrentContext => IsCasting ? _abilityContext : null;
+
         public AbilityRuntime CurrentAbility => IsCasting ? _currentAbility : null;
         public bool CanCancelCurrentAbility => _stateMachine?.CanCancel ?? false;
         public bool CanInterruptCurrentAbility => _stateMachine?.CanBeInterrupted ?? false;
@@ -86,7 +86,12 @@ namespace LOGIYGames.Abilities
             else if (inputProvider != null)
             {
                 inputProvider.enabled = false;
-                TargetingInput.Clear();
+
+                if (_abilityContext != null)
+                {
+                    _abilityContext.Target = null;
+                    _abilityContext.TargetPoint = Vector3.zero;
+                }
             }
         }
 
@@ -165,9 +170,9 @@ namespace LOGIYGames.Abilities
                 Animator = Animator,
                 CastOrigin = CastOrigin,
                 Ability = _currentAbility,
-                TargetingInput = TargetingInput,
             };
 
+            _abilityContext = ctx;
             _stateMachine = new AbilityStateMachine(ctx);
             ctx.OwnerMachine = _stateMachine;
 
