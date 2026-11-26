@@ -11,6 +11,10 @@ An ability is executed by an `AbilityStateMachine` through four configurable sta
 
 Each state owns a runtime strategy created from its ScriptableObject configuration. Configure interruption and cancellation separately for every state.
 
+## Camera rigs and cinematics
+
+Every phase config exposes the shared `CinemachinePrefab` and `ParentToCaster` fields. Assign any camera-rig prefab to `CinemachinePrefab`: a Cinemachine Virtual Camera, Cinemachine Camera, Dolly rig, or a custom composition. The rig is instantiated when the phase is entered and destroyed when it exits. `ParentToCaster` parents the prefab to the caster while preserving its authored local position and rotation. For example, assign a dedicated camera prefab to the Targeting config to provide a more convenient aiming view. The core runtime has no dependency on a specific Cinemachine version; implement `IAbilityCinematicCameraBinder` to configure Follow/LookAt or target bindings at runtime.
+
 ## Cancel vs. interrupt
 
 | Operation | Purpose | Configuration |
@@ -103,7 +107,7 @@ When implementing a custom `IAbilityStateStrategy`, implement both policy method
 
 ## Configuration checklist
 
-For each Warmup, Targeting, Casting, and Release config asset:
+For each Warmup, Targeting, Casting, and Release config:
 
 1. Enable **Allow Cancel** when manual/AI cancellation should be accepted in that state.
 2. Set **Min Time Before Cancel** to prevent cancellation too early in that state.
@@ -117,7 +121,6 @@ Cancellation settings have been promoted to `AbilityStateStrategyConfig`, so eve
 ## Requirements
 
 - Unity 2022.3 or later.
-
 
 ## For coding agents
 
