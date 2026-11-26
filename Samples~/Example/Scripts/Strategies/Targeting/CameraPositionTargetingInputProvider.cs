@@ -5,7 +5,7 @@ namespace LOGIYGames.Abilities
     /// <summary>
     /// Example player-input adapter that converts the mouse cursor into world-space targeting data.
     /// Targeting strategies do not depend on this component or on a Camera.
-    /// AI can disable this provider and write directly to AbilityController.TargetingInput.
+    /// AI can disable this provider and write directly to AbilityController.CurrentContext.Target and TargetPoint.
     /// </summary>
     public class CameraPositionTargetingInputProvider : MonoBehaviour
     {
@@ -14,7 +14,7 @@ namespace LOGIYGames.Abilities
         [SerializeField, Min(0f)] private float _maxDistance = 50f;
         [SerializeField] private LayerMask _targetLayers = ~0;
 
-        /// <summary>Connects this camera adapter to the controller whose targeting input it will populate.</summary>
+        /// <summary>Connects this camera adapter to the controller whose active ability context it will update.</summary>
         /// <param name="controller">Controller that owns the shared targeting input data.</param>
         public void Initialize(AbilityController controller)
         {
@@ -42,7 +42,11 @@ namespace LOGIYGames.Abilities
 
             if (_camera == null)
             {
-                _controller.TargetingInput.Clear();
+                if (_controller.CurrentContext != null)
+                {
+                    _controller.CurrentContext.Target = null;
+                    _controller.CurrentContext.TargetPoint = Vector3.zero;
+                }
                 return;
             }
 
@@ -56,11 +60,13 @@ namespace LOGIYGames.Abilities
                 if (hit.collider.transform.root == _controller.transform.root)
                     continue;
 
-                _controller.TargetingInput.SetPosition(hit.point, hit.collider.gameObject);
+                _controller.CurrentContext.Target = hit.collider.gameObject;
+                _controller.CurrentContext.TargetPoint = hit.point;
                 return;
             }
 
-            _controller.TargetingInput.SetPosition(ray.GetPoint(_maxDistance));
+            _controller.CurrentContext.Target = null;
+            _controller.CurrentContext.TargetPoint = ray.GetPoint(_maxDistance);
         }
     }
 }
