@@ -5,12 +5,13 @@ namespace LOGIYGames.Abilities
     public class WarmupStrategyRuntime : IAbilityStateStrategy, IAnimationEventSink
     {
         private readonly WarmupStrategyConfig _cfg;
+        private readonly AbilityCinematicCameraRuntime _cameraRuntime = new();
         private float _elapsed;
         private bool _animEvent;
 
         public WarmupStrategyRuntime(WarmupStrategyConfig cfg) => _cfg = cfg;
 
-        public void OnEnter(AbilityContext ctx)
+        public virtual void OnEnter(AbilityContext ctx)
         {
             _elapsed = 0f;
             _animEvent = false;
@@ -24,19 +25,28 @@ namespace LOGIYGames.Abilities
                 ctx.Animator.SetBool("IsWarmuping", true);
                 ctx.Animator.CrossFadeInFixedTime(_cfg.AnimationData.AnimationName, _cfg.AnimationData.Crossfade);
             }
+
+            _cameraRuntime.OnEnter(ctx, _cfg);
         }
 
-        public void OnUpdate(AbilityContext ctx)
+        public virtual void OnUpdate(AbilityContext ctx)
         {
             _elapsed += Time.deltaTime;
             if (_elapsed >= _cfg.StateDuration || (_cfg.ExitStateOnAnimationEvent && _animEvent))
                 ctx.OwnerMachine.ChangeState(new TargetingState(ctx.Ability.Data.Targeting.CreateRuntime()));
         }
 
-        public void OnExit(AbilityContext ctx)
+        public virtual void OnExit(AbilityContext ctx)
         {
-            if (ctx.Animator != null)
-                ctx.Animator.SetBool("IsWarmuping", false);
+            try
+            {
+                _cameraRuntime.OnExit();
+            }
+            finally
+            {
+                if (ctx.Animator != null)
+                    ctx.Animator.SetBool("IsWarmuping", false);
+            }
         }
 
         public bool CanCancel(AbilityContext ctx)
