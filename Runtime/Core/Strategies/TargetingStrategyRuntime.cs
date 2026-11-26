@@ -5,6 +5,7 @@ namespace LOGIYGames.Abilities
     public class TargetingStrategyRuntime : IAbilityStateStrategy
     {
         protected readonly TargetingStrategyConfig _cfg;
+        private readonly AbilityCinematicCameraRuntime _cameraRuntime = new();
         private float _elapsed;
 
         public TargetingStrategyRuntime(TargetingStrategyConfig cfg) => _cfg = cfg;
@@ -25,6 +26,8 @@ namespace LOGIYGames.Abilities
                 ctx.Animator.SetBool("IsTargeting", true);
                 ctx.Animator.CrossFadeInFixedTime(_cfg.AnimationData.AnimationName, _cfg.AnimationData.Crossfade);
             }
+
+            _cameraRuntime.OnEnter(ctx, _cfg);
         }
 
         public virtual void OnUpdate(AbilityContext ctx)
@@ -39,8 +42,15 @@ namespace LOGIYGames.Abilities
 
         public virtual void OnExit(AbilityContext ctx)
         {
-            if (ctx.Animator != null)
-                ctx.Animator.SetBool("IsTargeting", false);
+            try
+            {
+                _cameraRuntime.OnExit();
+            }
+            finally
+            {
+                if (ctx.Animator != null)
+                    ctx.Animator.SetBool("IsTargeting", false);
+            }
         }
 
         public virtual bool CanCancel(AbilityContext ctx)
