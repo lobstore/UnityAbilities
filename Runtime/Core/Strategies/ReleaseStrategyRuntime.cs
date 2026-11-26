@@ -5,6 +5,7 @@ namespace LOGIYGames.Abilities
     public class ReleaseStrategyRuntime : IAbilityStateStrategy, IAnimationEventSink
     {
         private readonly ReleaseStrategyConfig _cfg;
+        private readonly AbilityCinematicCameraRuntime _cameraRuntime = new();
         private float _elapsed;
         private bool _animEvent;
         private bool _isRepeatTransition;
@@ -29,7 +30,7 @@ namespace LOGIYGames.Abilities
                 _animEvent = true;
         }
 
-        /// <summary>Resets release timing and starts the configured effects and animation.</summary>
+        /// <summary>Resets release timing and starts the configured effects, animation, and camera rig.</summary>
         public virtual void OnEnter(AbilityContext ctx)
         {
             _elapsed = 0f;
@@ -44,22 +45,31 @@ namespace LOGIYGames.Abilities
                 ctx.Animator.SetBool("IsReleasing", true);
                 ctx.Animator.CrossFadeInFixedTime(_cfg.AnimationData.AnimationName, _cfg.AnimationData.Crossfade);
             }
+
+            _cameraRuntime.OnEnter(ctx, _cfg);
         }
 
-        /// <summary>Restores the release animation flag and applies cooldown unless this is an internal repeat transition.</summary>
+        /// <summary>Restores the release animation flag and cleans up its camera rig before applying cooldown.</summary>
         public virtual void OnExit(AbilityContext ctx)
         {
-            if (ctx.Animator != null)
-                ctx.Animator.SetBool("IsReleasing", false);
+            try
+            {
+                _cameraRuntime.OnExit();
+            }
+            finally
+            {
+                if (ctx.Animator != null)
+                    ctx.Animator.SetBool("IsReleasing", false);
 
-            // A loop transition is part of the same ability activation, not its completion.
-            // Do not start cooldown between repeated releases.
-            if (_isRepeatTransition)
-                return;
-
-            // Cooldown is applied on final completion, cancellation, or interruption
-            // after the ability has reached the Release phase.
-            ctx.Ability.SetOnCooldown();
+                // A loop transition is part of the same ability activation, not its completion.
+                // Do not start cooldown between repeated releases.
+                if (!_isRepeatTransition)
+                {
+                    // Cooldown is applied on final completion, cancellation, or interruption
+                    // after the ability has reached the Release phase.
+                    ctx.Ability.SetOnCooldown();
+                }
+            }
         }
 
         /// <summary>Advances the release timer and completes the current iteration when its duration/event condition is met.</summary>
