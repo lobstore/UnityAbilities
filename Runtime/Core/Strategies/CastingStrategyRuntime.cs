@@ -5,6 +5,7 @@ namespace LOGIYGames.Abilities
     public class CastingStrategyRuntime : IAbilityStateStrategy, IAnimationEventSink
     {
         private readonly CastingStrategyConfig _cfg;
+        private readonly AbilityCinematicCameraRuntime _cameraRuntime = new();
         private float _elapsed;
         private bool _animEvent;
 
@@ -14,6 +15,7 @@ namespace LOGIYGames.Abilities
         {
             _elapsed = 0f;
             _animEvent = false;
+            _cameraRuntime.OnEnter(ctx, _cfg);
 
             if (_cfg.StateDuration == 0)
                 return;
@@ -25,13 +27,12 @@ namespace LOGIYGames.Abilities
 
             if (ctx.Animator != null && !string.IsNullOrEmpty(_cfg.AnimationData.AnimationName))
             {
-
                 ctx.Animator.SetBool("IsCasting", true);
                 ctx.Animator.CrossFadeInFixedTime(_cfg.AnimationData.AnimationName, _cfg.AnimationData.Crossfade);
             }
         }
 
-        public void OnUpdate(AbilityContext ctx)
+        public virtual void OnUpdate(AbilityContext ctx)
         {
             _elapsed += Time.deltaTime;
             if (_elapsed >= _cfg.StateDuration || (_cfg.ExitStateOnAnimationEvent && _animEvent))
@@ -40,8 +41,15 @@ namespace LOGIYGames.Abilities
 
         public virtual void OnExit(AbilityContext ctx)
         {
-            if (ctx.Animator != null)
-                ctx.Animator.SetBool("IsCasting", false);
+            try
+            {
+                _cameraRuntime.OnExit();
+            }
+            finally
+            {
+                if (ctx.Animator != null)
+                    ctx.Animator.SetBool("IsCasting", false);
+            }
         }
 
         public bool CanCancel(AbilityContext ctx)
