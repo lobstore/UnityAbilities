@@ -11,6 +11,14 @@ namespace LOGIYGames.Abilities
         public AbilityAnimationData AnimationData;
         public GameObject VFX;
         public AudioClip SFX;
+
+        [Header("Camera")]
+        [Tooltip("Optional camera rig prefab instantiated while this phase is active. Supports any Cinemachine setup, including Dolly cameras.")]
+        public GameObject CinemachinePrefab;
+
+        [Tooltip("Parent the camera rig to the caster while preserving the prefab's local position and rotation.")]
+        public bool ParentToCaster = true;
+
         public float StateDuration;
         public bool ExitStateOnAnimationEvent = false;
         public string AnimationEventName;
