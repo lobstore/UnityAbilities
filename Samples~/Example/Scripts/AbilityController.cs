@@ -16,6 +16,29 @@ namespace LOGIYGames.Abilities
         public Animator Animator;
         public Transform CastOrigin;
 
+        [Header("Targeting Input")]
+        [SerializeField] private bool _useCameraTargetingInput = true;
+
+        /// <summary>
+        /// Mutable targeting input shared with the active ability context.
+        /// AI and network systems can write to this object instead of using the camera input provider.
+        /// </summary>
+        public AbilityTargetingInput TargetingInput { get; } = new();
+
+        /// <summary>
+        /// Enables or disables the sample camera-to-world targeting adapter.
+        /// Set to false when an AI, network client, or scripted system supplies TargetingInput.
+        /// </summary>
+        public bool UseCameraTargetingInput
+        {
+            get => _useCameraTargetingInput;
+            set
+            {
+                _useCameraTargetingInput = value;
+                ConfigureTargetingInputProvider();
+            }
+        }
+
         private AbilityStateMachine _stateMachine;
         private AnimationEventReceiver _animReceiver;
 
@@ -45,6 +68,26 @@ namespace LOGIYGames.Abilities
             _animReceiver = GetComponent<AnimationEventReceiver>();
             if (_animReceiver != null)
                 _animReceiver.OnAnimationEvent += HandleAnimationEvent;
+
+            ConfigureTargetingInputProvider();
+        }
+
+        private void ConfigureTargetingInputProvider()
+        {
+            var inputProvider = GetComponent<CameraPositionTargetingInputProvider>();
+            if (_useCameraTargetingInput)
+            {
+                if (inputProvider == null)
+                    inputProvider = gameObject.AddComponent<CameraPositionTargetingInputProvider>();
+
+                inputProvider.enabled = true;
+                inputProvider.Initialize(this);
+            }
+            else if (inputProvider != null)
+            {
+                inputProvider.enabled = false;
+                TargetingInput.Clear();
+            }
         }
 
         private void OnDestroy()
@@ -122,6 +165,7 @@ namespace LOGIYGames.Abilities
                 Animator = Animator,
                 CastOrigin = CastOrigin,
                 Ability = _currentAbility,
+                TargetingInput = TargetingInput,
             };
 
             _stateMachine = new AbilityStateMachine(ctx);

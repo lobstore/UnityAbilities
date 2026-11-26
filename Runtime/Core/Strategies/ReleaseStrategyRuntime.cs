@@ -7,23 +7,29 @@ namespace LOGIYGames.Abilities
         private readonly ReleaseStrategyConfig _cfg;
         private float _elapsed;
         private bool _animEvent;
+        private bool _isRepeatTransition;
 
+        /// <summary>Creates a release runtime using the supplied settings asset.</summary>
         public ReleaseStrategyRuntime(ReleaseStrategyConfig cfg)
         {
             _cfg = cfg;
         }
 
+        /// <summary>Checks whether the current release phase allows interruption.</summary>
         public bool CanBeInterrupted(AbilityContext ctx) => _cfg.IsInterruptible;
 
+        /// <summary>Checks the configured cancellation permission and minimum time spent in Release.</summary>
         public virtual bool CanCancel(AbilityContext ctx)
             => _cfg.AllowCancel && _elapsed >= _cfg.MinTimeBeforeCancel;
 
+        /// <summary>Records the configured animation event used to complete this release phase.</summary>
         public void OnAnimationEvent(string eventName)
         {
             if (eventName == _cfg.AnimationEventName)
                 _animEvent = true;
         }
 
+        /// <summary>Resets release timing and starts the configured effects and animation.</summary>
         public virtual void OnEnter(AbilityContext ctx)
         {
             _elapsed = 0f;
@@ -40,21 +46,61 @@ namespace LOGIYGames.Abilities
             }
         }
 
+        /// <summary>Restores the release animation flag and applies cooldown unless this is an internal repeat transition.</summary>
         public virtual void OnExit(AbilityContext ctx)
         {
             if (ctx.Animator != null)
                 ctx.Animator.SetBool("IsReleasing", false);
 
-            // Cooldown is applied when the release phase exits, including cancellation
-            // or interruption after the ability has reached this phase.
+            // A loop transition is part of the same ability activation, not its completion.
+            // Do not start cooldown between repeated releases.
+            if (_isRepeatTransition)
+                return;
+
+            // Cooldown is applied on final completion, cancellation, or interruption
+            // after the ability has reached the Release phase.
             ctx.Ability.SetOnCooldown();
         }
 
+        /// <summary>Advances the release timer and completes the current iteration when its duration/event condition is met.</summary>
         public virtual void OnUpdate(AbilityContext ctx)
         {
             _elapsed += Time.deltaTime;
             if (_elapsed >= _cfg.StateDuration || (_cfg.ExitStateOnAnimationEvent && _animEvent))
-                ctx.OwnerMachine.Finish();
+                OnReleaseCompleted(ctx);
+        }
+
+        /// <summary>
+        /// Completes the current release iteration. When MaxIterations is greater than one,
+        /// starts another targeting phase before completing the ability.
+        /// Override this method to customize iteration completion; call the base implementation
+        /// on the final iteration to preserve the standard finish behavior.
+        /// </summary>
+        /// <param name="ctx">Context for the active ability, including its release iteration counter.</param>
+        protected virtual void OnReleaseCompleted(AbilityContext ctx)
+        {
+            int maxIterations = Mathf.Max(1, _cfg.MaxIterations);
+            if (ctx.ReleaseIteration + 1 < maxIterations)
+            {
+                ctx.ReleaseIteration++;
+                // The ability has already released at least once. Keep cooldown active
+                // even if it is cancelled during the next Targeting/Casting iteration.
+                ctx.Ability.SetOnCooldown();
+                _isRepeatTransition = true;
+                try
+                {
+                    ctx.OwnerMachine.ChangeState(
+                        new TargetingState(ctx.Ability.Data.Targeting.CreateRuntime()));
+                }
+                finally
+                {
+                    _isRepeatTransition = false;
+                }
+
+                return;
+            }
+
+            ctx.OwnerMachine.Finish();
         }
     }
 }

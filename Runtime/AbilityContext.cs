@@ -7,6 +7,11 @@ namespace LOGIYGames.Abilities
         public GameObject Caster;
         public GameObject Target;
         public Vector3 TargetPoint;
+        /// <summary>Input data supplied by the player, AI, network, or scripted targeting source.</summary>
+        public AbilityTargetingInput TargetingInput;
+
+        /// <summary>Zero-based completed-release counter used by strategies with MaxIterations greater than one.</summary>
+        public int ReleaseIteration;
         public Animator Animator;
         public AbilityRuntime Ability;
         public Transform CastOrigin;
