@@ -11,6 +11,10 @@
 
 Для каждого состояния создаётся runtime-стратегия на основе ScriptableObject-конфигурации. Отмена и прерывание настраиваются независимо для каждого состояния.
 
+## Камеры и синематики
+
+В каждой конфигурации фазы доступны общие поля `CinemachinePrefab` и `ParentToCaster`. Назначьте в `CinemachinePrefab` prefab с любым camera rig: Cinemachine Virtual Camera, Cinemachine Camera, Dolly или собственной композицией. Rig создаётся при входе в фазу и уничтожается при выходе из неё. `ParentToCaster` помещает prefab под исполнителя, сохраняя заданные в prefab локальные позицию и поворот. Например, для отдельного ракурса удобного наведения назначьте camera prefab в конфигурации Targeting. Основной runtime не зависит от конкретной версии Cinemachine; для настройки Follow/LookAt или цели во время выполнения добавьте компонент, реализующий `IAbilityCinematicCameraBinder`.
+
 ## Отмена и прерывание — в чём разница
 
 | Операция | Назначение | Настройки |
@@ -117,7 +121,6 @@ bool started = _controller.TryActivateAbility(next, interruptCurrent: true);
 ## Требования
 
 - Unity 2022.3 или новее.
-
 
 ## Для coding agents
 
