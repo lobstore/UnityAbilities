@@ -17,7 +17,7 @@ namespace LOGIYGames.Abilities
             // Проверка «свой/чужой», чтобы не ударить кастера
             if (collision.gameObject == _ctx.Caster) return;
             OnCollided.Invoke();
-            Destroy(gameObject);
+            Destroy(gameObject, 5);
         }
     }
 }

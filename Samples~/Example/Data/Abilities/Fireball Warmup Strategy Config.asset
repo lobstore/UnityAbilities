@@ -16,8 +16,13 @@ MonoBehaviour:
     AnimationName: Warmup1
     Crossfade: 0.1
     MotionSpeed: 0
+    UseRootMotion: 0
   VFX: {fileID: 0}
   SFX: {fileID: 8300000, guid: 6ccbc3d284bd849d49fb1f8f94ab2888, type: 3}
-  StateDuration: 1
+  StateDuration: 0.5
   ExitStateOnAnimationEvent: 0
   AnimationEventName: WarmupComplete
+  AllowCancel: 0
+  MinTimeBeforeCancel: 0
+  IsInterruptible: 0
+  BlockMovement: 0

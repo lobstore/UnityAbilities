@@ -20,7 +20,7 @@ namespace LOGIYGames.Abilities
             if (_cfg.SFX != null)
                 AudioSource.PlayClipAtPoint(_cfg.SFX, ctx.Caster.transform.position);
 
-            if (ctx.Animator != null)
+            if (ctx.Animator != null && !string.IsNullOrEmpty(_cfg.AnimationData.AnimationName))
             {
                 ctx.Animator.SetBool("IsTargeting", true);
                 ctx.Animator.CrossFadeInFixedTime(_cfg.AnimationData.AnimationName, _cfg.AnimationData.Crossfade);
