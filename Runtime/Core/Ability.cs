@@ -15,13 +15,15 @@ namespace LOGIYGames.Abilities
             CooldownTimer = new CountdownTimer();
         }
 
-        public void SetOnCooldown()
+        public void SetOnCooldown() => SetOnCooldown(ProgressionState.Level);
+
+        public void SetOnCooldown(int abilityLevel)
         {
             float multiplier = 1f;
             AbilityProgressionDefinition progression = Data != null ? Data.Progression : null;
             if (progression != null)
             {
-                for (int level = 1; level <= ProgressionState.Level; level++)
+                for (int level = 1; level <= Mathf.Max(1, abilityLevel); level++)
                 {
                     AbilityLevelDefinition levelDefinition = progression.GetLevel(level);
                     if (levelDefinition != null)

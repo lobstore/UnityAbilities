@@ -9,7 +9,7 @@ namespace LOGIYGames.Abilities
         public override void OnExit()
         {
             base.OnExit();
-            _ctx.Ability.SetOnCooldown();
+            _ctx.Ability.SetOnCooldown(_ctx.AbilityLevel);
         }
     }
 }
