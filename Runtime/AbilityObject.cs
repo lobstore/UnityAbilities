@@ -18,8 +18,19 @@ namespace LOGIYGames.Abilities
         public virtual void Initialize(AbilityObjectContext context)
         {
             _sourceContext = context != null ? context.SourceContext : null;
-            if (config == null || _sourceContext == null) return;
+            if (_sourceContext == null) return;
 
+            if (context.InitialEffects != null && context.InitialEffects.Count > 0)
+            {
+                AbilityEffectController effectController = GetComponent<AbilityEffectController>();
+                if (effectController == null)
+                    effectController = gameObject.AddComponent<AbilityEffectController>();
+
+                foreach (AbilityEffectDefinition effect in context.InitialEffects)
+                    effectController.ApplyEffect(effect, new AbilityEffectContext(_sourceContext, gameObject));
+            }
+
+            if (config == null) return;
             _strategy = config.CreateRuntime(_sourceContext);
             _strategy?.Initialize(this);
             _moduleHost = new AbilityModuleHost(config.Modules, _sourceContext,

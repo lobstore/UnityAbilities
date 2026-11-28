@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace LOGIYGames.Abilities
@@ -16,6 +17,7 @@ namespace LOGIYGames.Abilities
         public Vector3 RotationOffset;
         [Min(0f)] public float LifetimeSeconds = 8f;
         public AbilityResourceScope ResourceScope = AbilityResourceScope.Detached;
+        public List<AbilityEffectDefinition> InitialEffects = new();
 
         public override AbilityModuleRuntime CreateRuntime(AbilityContext context)
             => new SpawnAbilityObjectModuleRuntime(this, context);
@@ -37,7 +39,7 @@ namespace LOGIYGames.Abilities
             if (instance == null) return;
 
             if (instance.TryGetComponent(out AbilityObject abilityObject))
-                abilityObject.Initialize(new AbilityObjectContext(Context));
+                abilityObject.Initialize(new AbilityObjectContext(Context, _factory.InitialEffects));
 
             if (_factory.LifetimeSeconds > 0f)
                 UnityEngine.Object.Destroy(instance, _factory.LifetimeSeconds);

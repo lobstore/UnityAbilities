@@ -1,76 +1,70 @@
 # Ability Modules, Effects, Flow и Progression
 
-Эта документация описывает расширения runtime API. Все модули создают отдельный runtime-экземпляр через `CreateRuntime`; изменяемое состояние не должно храниться в factory-конфигурации.
+Это руководство описывает расширения runtime API. Factory хранит только сериализуемые настройки; изменяемое состояние конкретной активации хранится в runtime-модулях.
 
 ## Точки подключения
 
 - `AbilityDefinition.Modules` — модули на всё время одной активации.
-- `AbilityStateStrategyFactory.Modules` — модули конкретной фазы.
+- `AbilityStateStrategyFactory.Modules` — модули одной фазы.
 - `AbilityObjectStrategyFactory.Modules` — модули отдельного `AbilityObject`.
-- `AbilityDefinition.FlowModules` — правила переходов между фазами.
-- `AbilityDefinition.Progression` — конфигурация уровней навыка.
+- `AbilityDefinition.FlowModules` — правила перехода между фазами.
+- `AbilityDefinition.Progression` — настройки уровней.
 
-Списки используют `SerializeReference`. В Inspector добавляйте конкретные реализации из списка managed references.
+Списки модулей используют `SerializeReference`. В Inspector добавляйте конкретные классы из списка managed references.
 
 ## События
 
-`AbilityEventDispatcher` публикует:
+`AbilityEventDispatcher` публикует `AbilityStarted`, `StateEntered`, `StateExited`, `AnimationEvent`, `IterationStarted`, `ReleasePerformed`, `AbilityCancelled`, `AbilityInterrupted`, `AbilityEnded`, `AbilityLevelChanged` и `ObjectCollision`.
 
-- `AbilityStarted`, `StateEntered`, `StateExited`;
-- `AnimationEvent`, `IterationStarted`, `ReleasePerformed`;
-- `AbilityCancelled`, `AbilityInterrupted`, `AbilityEnded`;
-- `AbilityLevelChanged`, `ObjectCollision`.
-
-Каждый модуль наследуется от `AbilityModuleRuntime` и может переопределить `OnEvent`, `Tick` и `Dispose`.
+Наследуйте `AbilityModuleRuntime` и переопределяйте `OnEvent`, `Tick` и `Dispose`. Runtime создаётся заново через factory при каждом запуске способности.
 
 ## Встроенные presentation-модули
 
 ### SpawnVFXModuleFactory
 
-Настройте `Prefab`, `Trigger`, `FilterByPhase`/`Phase`, позицию, anchor, lifetime и `ResourceScope`.
+Настройте prefab, trigger, фильтр фазы, позицию, anchor, lifetime и `ResourceScope`.
 
 ### SpawnAttachedObjectModuleFactory
 
-Создаёт объект при старте способности и прикрепляет его к персонажу или именованной дочерней точке. Например, укажите `AnchorName = RightHand`, prefab фантомного меча и `ResourceScope = Ability`: объект будет удалён при завершении способности.
+Создаёт объект при старте способности и прикрепляет к персонажу или именованной дочерней точке. Для фантомного меча задайте prefab, `AnchorName = RightHand` и `ResourceScope = Ability`; объект будет очищен при завершении способности.
 
 ### PlaySFXModuleFactory
 
-Воспроизводит `AudioClip` при выбранном событии. При назначении `AudioSource` используется `PlayOneShot`; без источника создаётся временный AudioSource около кастера.
+Воспроизводит AudioClip при выбранном событии. С назначенным AudioSource используется `PlayOneShot`; без источника создаётся временный AudioSource рядом с кастером.
 
 ## Gameplay Effects
 
-Добавьте `AbilityEffectController` на GameObject, который принимает эффекты. Он реализует `IAbilityEffectReceiver` и обновляет активные эффекты, снимая их по завершении длительности.
+Добавьте `AbilityEffectController` на персонажа или цель. Компонент реализует `IAbilityEffectReceiver` и отслеживает duration/stacking для активных эффектов.
 
-`ApplyEffectModuleFactory` выбирает кастера, первую цель или все цели. Модуль можно разместить в `AbilityDefinition.Modules`, чтобы он слушал события на протяжении всей способности, либо в фазовой конфигурации.
+`ApplyEffectModuleFactory` выбирает кастера, первую цель или все цели. Модуль в `AbilityDefinition.Modules` может слушать события на протяжении способности; модуль в фазовой конфигурации ограничен временем жизни фазы. Нефильтрованный `StateEntered` подходит, когда действие должно срабатывать при входе в каждую фазу.
 
-`AbilityEffectDefinition` — расширяемая ScriptableObject-конфигурация. Для собственных баффов/дебаффов унаследуйте её и реализуйте `CreateRuntime`; runtime эффекта реализует `OnApply`, `Tick`, `OnRemove`. Встроенный `TimedVisualEffectDefinition` показывает базовый эффект, создающий визуальный объект на цели.
+`AbilityEffectDefinition` — расширяемая ScriptableObject-конфигурация. Для собственного баффа/дебаффа унаследуйте её и реализуйте `CreateRuntime`; runtime эффекта реализует `OnApply`, `Tick`, `OnRemove`. Встроенный `TimedVisualEffectDefinition` демонстрирует визуальный эффект на выбранной цели.
 
-Политики наложения: `Stack`, `Refresh`, `Ignore`.
+Политики наложения: `Stack`, `Refresh`, `Ignore`. Duration равный нулю означает отсутствие автоматического тайм-аута; снятие в этом случае выполняется по освобождению handle или уничтожению EffectController.
+
+## Создание объектов с эффектами
+
+`SpawnAbilityObjectModuleFactory` создаёт prefab по событию. Если на объекте есть `AbilityObject`, модуль передаёт ему `AbilityObjectContext`. В поле `InitialEffects` можно назначить эффекты, которые будут применены к самому созданному объекту. Для внутренних реакций добавляйте модули в `AbilityObjectStrategyFactory.Modules`; события столкновения получают только модули соответствующего объекта.
 
 ## Владение ресурсами
 
-`AbilityResourceRegistry` поддерживает:
+`AbilityResourceRegistry` поддерживает три области:
 
-- `Ability` — очищается при завершении способности;
-- `State` — очищается при выходе из соответствующей фазы;
+- `Ability` — очищается при завершении способности.
+- `State` — очищается при выходе из конкретной фазы.
 - `Detached` — не очищается вместе с родительской способностью.
 
-Для ресурсов, которые создаёт модуль, регистрируйте `GameObject`, `IDisposable` или callback освобождения. Чтобы передать существующий handle, используйте `Resources.Detach(handle)`.
-
-У снаряда, которому нужно пережить завершение каста, оставляйте собственный lifetime и scope `Detached`. Внутренние модули `AbilityObject` получают события столкновений только своего объекта.
+Регистрируйте GameObject, IDisposable или callback освобождения. Для передачи уже зарегистрированного ресурса за пределы scope используйте `Resources.Detach(handle)`. Снаряд, которому нужно пережить завершение каста, должен иметь собственный lifetime и detached-владение.
 
 ## Flow: повторение цикла
 
-Добавьте `RepeatCycleModuleFactory` в `AbilityDefinition.FlowModules`.
+Добавьте `RepeatCycleModuleFactory` в `AbilityDefinition.FlowModules`. `RepeatCount` — число дополнительных повторов после первого выполнения; `RepeatFrom` задаёт фазу возврата (`Targeting`, `Casting` или `Release`).
 
-- `RepeatCount` — количество дополнительных повторов после первой итерации;
-- `RepeatFrom` — фаза возврата: `Targeting`, `Casting` или `Release`.
-
-Когда подключён Flow-модуль, `ReleaseStrategyRuntime` передаёт выбор следующей фазы `AbilityFlowResolver`. Если Flow-модулей нет, продолжают работать старые поля `Release.Repeat` и `Release.RepeatFrom` для обратной совместимости.
+Если Flow-модулей нет, продолжают работать прежние поля `Release.Repeat` и `Release.RepeatFrom`. Если подключён Flow-модуль, выбор следующей фазы выполняет `AbilityFlowResolver`.
 
 ## Progression
 
-У `Ability` есть собственный `ProgressionState`. Установить уровень до активации можно так:
+У экземпляра `Ability` есть `ProgressionState`. Установите загруженный уровень до запуска:
 
 ```csharp
 ability.ProgressionState.SetLevel(ability.Data, savedLevel);
@@ -82,12 +76,12 @@ ability.ProgressionState.SetLevel(ability.Data, savedLevel);
 bool upgraded = ability.ProgressionState.TryUpgrade(ability.Data, activeContext);
 ```
 
-Каждый `AbilityLevelDefinition` может задавать множители урона/перезарядки и список дополнительных модулей. Модули уровней до текущего включительно активируются при старте способности; при повышении уровня новые модули добавляются и публикуется `AbilityLevelChanged`.
+`AbilityLevelDefinition` задаёт множители урона/перезарядки и дополнительные модули. Модули всех достигнутых уровней активируются при старте; при повышении уровня новые модули подключаются и публикуется `AbilityLevelChanged`.
 
-`AbilityContext.Parameters` содержит `DamageMultiplier` и `CooldownMultiplier`, а также предоставляет типизированные методы `GetFloat/GetInt/GetBool` и `SetFloat/SetInt/SetBool` для проектных параметров. Снимок параметров создаётся при старте runtime контекста.
+`AbilityContext.Parameters` содержит стандартные `DamageMultiplier` и `CooldownMultiplier`, а также предоставляет `GetFloat/GetInt/GetBool` и `SetFloat/SetInt/SetBool` для проектных параметров. Контекст фиксирует значения на начало активации.
 
-## Конец способности
+## Причина завершения
 
-`AbilityStateMachine.TryCancel` и `TryInterrupt` публикуют разные причины завершения. `Finish()` означает нормальное завершение. Модули получают событие причины завершения до их освобождения.
+`TryCancel` и `TryInterrupt` публикуют разные события завершения. `Finish()` означает нормальное завершение. Событие причины передаётся модулям до их освобождения.
 
-Реализация рассчитана на Unity 2022.3+. Перед использованием в проекте выполните проверку компиляции и Play Mode тесты в целевой версии Unity.
+Реализация рассчитана на Unity 2022.3+. Перед использованием выполните компиляцию и Play Mode проверки в целевой версии Unity.
