@@ -1,42 +1,50 @@
 namespace LOGIYGames.Abilities
 {
-    public abstract class AbilityState
+    public class AbilityState
     {
-        public IAbilityStateStrategy Strategy { get; protected set; }
+        public AbilityStrategyRuntime Strategy { get; protected set; }
 
-        public virtual void Enter(AbilityContext ctx) => Strategy?.OnEnter(ctx);
-        public virtual void Update(AbilityContext ctx) => Strategy?.OnUpdate(ctx);
-        public virtual void Exit(AbilityContext ctx) => Strategy?.OnExit(ctx);
+        public AbilityState(AbilityStrategyRuntime strategy)
+        {
+            Strategy = strategy;
+        }
+
+        public virtual void Enter() => Strategy?.OnEnter();
+        public virtual void Update() => Strategy?.OnUpdate();
+        public virtual void Exit() => Strategy?.OnExit();
 
         /// <summary>
         /// Returns whether cancellation is currently allowed by this state's strategy.
         /// </summary>
-        public virtual bool CanCancel(AbilityContext ctx) => Strategy?.CanCancel(ctx) ?? false;
+        public virtual bool CanBeCancelled() => Strategy?.CanBeCancelled() ?? false;
 
         /// <summary>
         /// Returns whether another ability is allowed to interrupt this state.
         /// </summary>
-        public virtual bool CanBeInterrupted(AbilityContext ctx)
-            => Strategy?.CanBeInterrupted(ctx) ?? false;
+        public virtual bool CanBeInterrupted() => Strategy?.CanBeInterrupted() ?? false;
     }
 
-    public class WarmupState : AbilityState
-    {
-        public WarmupState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    }
+    //public class WarmupState : AbilityState
+    //{
+    //    public WarmupState(IAbilityStateStrategy strategy) => Strategy = strategy;
+    //}
 
-    public class TargetingState : AbilityState
-    {
-        public TargetingState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    }
+    //public class TargetingState : AbilityState
+    //{
+    //    public TargetingState(IAbilityStateStrategy strategy) => Strategy = strategy;
+    //}
 
-    public class CastingState : AbilityState
-    {
-        public CastingState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    }
+    //public class CastingState : AbilityState
+    //{
+    //    public CastingState(IAbilityStateStrategy strategy) => Strategy = strategy;
+    //}
 
-    public class ReleaseState : AbilityState
-    {
-        public ReleaseState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    }
+    //public class ReleaseState : AbilityState
+    //{
+    //    public ReleaseState(IAbilityStateStrategy strategy) => Strategy = strategy;
+    //}
+    //public class ExitingState : AbilityState
+    //{
+    //    public ExitingState(IAbilityStateStrategy strategy) => Strategy = strategy;
+    //}
 }

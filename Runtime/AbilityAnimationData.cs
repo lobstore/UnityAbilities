@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace LOGIYGames.Abilities
 {
@@ -6,8 +7,9 @@ namespace LOGIYGames.Abilities
     public struct AbilityAnimationData
     {
         public string AnimationName;
-        public float Crossfade;
-        public float MotionSpeed;
+        [Min(0)] public float Crossfade;
+        [Min(0)] public float MotionSpeed;
         public bool UseRootMotion;
+        public uint layerIndex;
     }
 }

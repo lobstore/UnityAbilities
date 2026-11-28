@@ -1,55 +1,46 @@
+using System;
+
 namespace LOGIYGames.Abilities
 {
     public class AbilityStateMachine
     {
         private AbilityState _current;
-        private readonly AbilityContext _ctx;
-
-        public bool IsFinished { get; private set; }
-        public AbilityState Current => _current;
-
-        /// <summary>
-        /// True when the active state currently allows cancellation.
-        /// </summary>
-        public bool CanCancel => !IsFinished && _current != null && _current.CanCancel(_ctx);
-
-        /// <summary>
-        /// True when the active state currently allows interruption by another ability.
-        /// </summary>
-        public bool CanBeInterrupted
-            => !IsFinished && _current != null && _current.CanBeInterrupted(_ctx);
-
-        public AbilityStateMachine(AbilityContext ctx) => _ctx = ctx;
-
+        public AbilityState CurrentState => _current;
+        public event Action StateChanged;
+        public event Action Finished;
         public void ChangeState(AbilityState next)
         {
-            if (IsFinished)
-                return;
-
-            _current?.Exit(_ctx);
+            _current?.Exit();
             _current = next;
-            _current?.Enter(_ctx);
+            StateChanged?.Invoke();
+            _current?.Enter();
         }
 
         public void Update(float deltaTime)
         {
-            if (IsFinished || _current == null)
+            if (_current == null)
                 return;
 
-            _current.Update(_ctx);
+            _current.Update();
         }
 
         /// <summary>
-        /// Requests a regular cancellation. The active state's CanCancel policy is respected.
+        /// Requests a regular cancellation. The active state's CanBeCancelled policy is respected.
         /// </summary>
         /// <returns>True when the ability was cancelled.</returns>
         public bool TryCancel()
         {
-            if (!CanCancel)
+            if (_current == null) return false;
+            if (_current.CanBeCancelled())
+            {
+                Finish();
+                return true;
+            }
+            else
+            {
                 return false;
+            }
 
-            Finish();
-            return true;
         }
 
         /// <summary>
@@ -59,11 +50,17 @@ namespace LOGIYGames.Abilities
         /// <returns>True when the ability was interrupted.</returns>
         public bool TryInterrupt()
         {
-            if (!CanBeInterrupted)
-                return false;
+            if (_current == null) return false;
 
-            Finish();
-            return true;
+            if (_current.CanBeInterrupted())
+            {
+                Finish();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -72,20 +69,10 @@ namespace LOGIYGames.Abilities
         /// </summary>
         public void Finish()
         {
-            if (IsFinished)
-                return;
-
-            IsFinished = true;
-            var previous = _current;
-            try
-            {
-                // Keep Current available while the exiting strategy performs cleanup.
-                previous?.Exit(_ctx);
-            }
-            finally
-            {
-                _current = null;
-            }
+            if (_current == null) return;
+            _current?.Exit();
+            _current = null;
+            Finished?.Invoke();
         }
     }
 }
