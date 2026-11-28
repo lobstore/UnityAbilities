@@ -24,27 +24,4 @@ namespace LOGIYGames.Abilities
         public virtual bool CanBeInterrupted() => Strategy?.CanBeInterrupted() ?? false;
     }
 
-    //public class WarmupState : AbilityState
-    //{
-    //    public WarmupState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    //}
-
-    //public class TargetingState : AbilityState
-    //{
-    //    public TargetingState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    //}
-
-    //public class CastingState : AbilityState
-    //{
-    //    public CastingState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    //}
-
-    //public class ReleaseState : AbilityState
-    //{
-    //    public ReleaseState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    //}
-    //public class ExitingState : AbilityState
-    //{
-    //    public ExitingState(IAbilityStateStrategy strategy) => Strategy = strategy;
-    //}
 }

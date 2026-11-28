@@ -16,7 +16,7 @@ namespace LOGIYGames.Abilities
             _current?.Enter();
         }
 
-        public void Update(float deltaTime)
+        public void Update()
         {
             if (_current == null)
                 return;

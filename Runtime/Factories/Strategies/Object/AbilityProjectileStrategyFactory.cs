@@ -6,9 +6,7 @@ namespace LOGIYGames.Abilities
     public class AbilityProjectileStrategyFactory : AbilityObjectStrategyFactory
     {
         public float Speed = 10;
-        public override AbilityObjectStrategyRuntime CreateRuntime()
-        {
-            return new AbilityProjectileStrategyRuntime(this);
-        }
+        public override AbilityObjectStrategyRuntime CreateRuntime(AbilityContext ctx) =>new AbilityProjectileStrategyRuntime(this, ctx);
+
     }
 }

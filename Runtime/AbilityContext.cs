@@ -3,14 +3,18 @@ using UnityEngine;
 
 namespace LOGIYGames.Abilities
 {
+    public class AbilityTargetData
+    {
+        public List<GameObject> Targets;
+        public Vector3 Position;
+        public Vector3 Direction;
+    }
     public class AbilityContext
     {
         public AbilityStateMachine OwnerMachine;
         public Ability Ability;
+        public AbilityTargetData TargetingData;
         public GameObject Caster;
-        public List<GameObject> Targets;
         public Transform CastOrigin;
-        public Transform InstantiationPivot;
-        public GameObject AbilityInstancePrefab;
     }
 }

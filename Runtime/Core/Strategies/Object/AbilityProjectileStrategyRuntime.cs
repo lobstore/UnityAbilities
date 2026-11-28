@@ -5,13 +5,13 @@ namespace LOGIYGames.Abilities
     public class AbilityProjectileStrategyRuntime : AbilityObjectStrategyRuntime
     {
         private readonly AbilityProjectileStrategyFactory _cfg;
-        public AbilityProjectileStrategyRuntime(AbilityProjectileStrategyFactory cfg) : base(cfg) { _cfg = cfg; }
-        public override void Initialize(AbilityContext ctx)
+        public AbilityProjectileStrategyRuntime(AbilityProjectileStrategyFactory cfg, AbilityContext ctx) : base(cfg, ctx) { _cfg = cfg; }
+        public override void Initialize(AbilityObject @object)
         {
-            base.Initialize(ctx);
-            if (ctx.AbilityInstancePrefab.TryGetComponent(out Rigidbody rb))
+            base.Initialize(@object);
+            if (@object.TryGetComponent(out Rigidbody rb))
             {
-                rb.linearVelocity = ctx.Caster.transform.forward * _cfg.Speed;
+                rb.linearVelocity = _ctx.Caster.transform.forward * _cfg.Speed;
             }
 
         }

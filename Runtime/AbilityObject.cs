@@ -3,6 +3,8 @@ using UnityEngine.Events;
 
 namespace LOGIYGames.Abilities
 {
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Collider))]
     public class AbilityObject : MonoBehaviour
     {
         public UnityEvent<Collision> Collided = new();
@@ -10,8 +12,8 @@ namespace LOGIYGames.Abilities
         AbilityObjectStrategyRuntime _strategy;
         public virtual void Initialize(AbilityContext ctx)
         {
-            _strategy = config.CreateRuntime();
-            _strategy?.Initialize(ctx);
+            _strategy = config.CreateRuntime(ctx);
+            _strategy?.Initialize(this);
         }
         public void Update()
         {
@@ -20,11 +22,7 @@ namespace LOGIYGames.Abilities
         private void OnCollisionEnter(Collision collision)
         {
             Collided.Invoke(collision);
-            _strategy.OnCollisionEnter(collision);
-        }
-        private void OnDestroy()
-        {
-            _strategy.Dispose();
+            _strategy?.OnCollisionEnter(collision);
         }
     }
 }

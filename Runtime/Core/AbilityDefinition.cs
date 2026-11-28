@@ -10,10 +10,10 @@ namespace LOGIYGames.Abilities
         public Sprite Icon;
         public string Description;
         [Min(0)] public float CooldownDuration = 0;
-        public WarmupStrategyConfig Warmup;
-        public TargetingStrategyConfig Targeting;
-        public CastingStrategyConfig Casting;
-        public ReleaseStrategyConfig Release;
-        public ExitingStrategyConfig Exiting;
+        [SerializeReference] public WarmupStrategyFactory Warmup = new WarmupStrategyFactory();
+        [SerializeReference] public TargetingStrategyFactory Targeting = new TargetingStrategyFactory();
+        [SerializeReference] public CastingStrategyFactory Casting = new CastingStrategyFactory();
+        [SerializeReference] public ReleaseStrategyFactory Release = new ReleaseStrategyFactory();
+        [SerializeReference] public ExitingStrategyFactory Exiting = new ExitingStrategyFactory();
     }
 }

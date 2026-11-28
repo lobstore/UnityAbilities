@@ -3,27 +3,28 @@ using UnityEngine;
 
 namespace LOGIYGames.Abilities
 {
-    public class AbilityObjectStrategyRuntime : IDisposable
+    public class AbilityObjectStrategyRuntime
     {
         AbilityObjectStrategyFactory _cfg;
         protected AbilityContext _ctx;
-        public AbilityObjectStrategyRuntime(AbilityObjectStrategyFactory cfg)
+        protected AbilityObject _abilityObject;
+        public AbilityObjectStrategyRuntime(AbilityObjectStrategyFactory cfg, AbilityContext ctx)
         {
             _cfg = cfg;
-        }
-        public virtual void Initialize(AbilityContext ctx)
-        {
             _ctx = ctx;
-            UnityEngine.Object.Destroy(_ctx.AbilityInstancePrefab, _cfg.LifeTime);
+        }
+        public virtual void Initialize(AbilityObject @object)
+        {
+            _abilityObject = @object;
+            UnityEngine.Object.Destroy(@object.gameObject, _cfg.LifeTime);
         }
         public virtual void Update() { }
         public virtual void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject == _ctx.Caster && !_ctx.Targets.Contains(collision.gameObject)) return;
-            UnityEngine.Object.Destroy(_ctx.AbilityInstancePrefab, _cfg.LifeTime);
+            if (collision.gameObject == _ctx.Caster) return;
+            UnityEngine.Object.Destroy(_abilityObject.gameObject, _cfg.LifeTime);
         }
         public virtual void OnCollisionStay(){}
 
-        public virtual void Dispose() { }
     }
 }
