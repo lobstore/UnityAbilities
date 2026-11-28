@@ -11,7 +11,7 @@ namespace LOGIYGames.Abilities
             base.Initialize(@object);
             if (@object.TryGetComponent(out Rigidbody rb))
             {
-                rb.linearVelocity = _ctx.Caster.transform.forward * _cfg.Speed;
+                rb.linearVelocity = @object.transform.forward * _cfg.Speed;
             }
 
         }

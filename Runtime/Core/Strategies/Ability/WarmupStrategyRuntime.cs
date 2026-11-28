@@ -2,11 +2,9 @@ namespace LOGIYGames.Abilities
 {
     public class WarmupStrategyRuntime : AbilityStrategyRuntime
     {
-        public WarmupStrategyRuntime(WarmupStrategyFactory cfg, AbilityContext context) : base(cfg, context) {}
-
+        public WarmupStrategyRuntime(WarmupStrategyFactory cfg, AbilityContext context) : base(cfg, context) { }
+        protected override AbilityPhase Phase => AbilityPhase.Warmup;
         protected override void StateTransitionRules()
-        {
-            _ctx.OwnerMachine.ChangeState(new AbilityState(_ctx.Ability.Data.Targeting.CreateRuntime(_ctx)));
-        }
+            => _ctx.OwnerMachine.ChangeState(_ctx.CreateState(AbilityPhase.Targeting));
     }
 }

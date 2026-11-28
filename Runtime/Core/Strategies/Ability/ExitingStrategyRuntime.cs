@@ -2,16 +2,14 @@ namespace LOGIYGames.Abilities
 {
     public class ExitingStrategyRuntime : AbilityStrategyRuntime
     {
-        public ExitingStrategyRuntime(AbilityStateStrategyFactory cfg, AbilityContext context) : base(cfg, context) {}
+        public ExitingStrategyRuntime(AbilityStateStrategyFactory cfg, AbilityContext context) : base(cfg, context) { }
+        protected override AbilityPhase Phase => AbilityPhase.Exiting;
+        protected override void StateTransitionRules() => _ctx.OwnerMachine.Finish();
 
-        protected override void StateTransitionRules()
-        {
-            _ctx.OwnerMachine.Finish();
-        }
         public override void OnExit()
         {
             base.OnExit();
-            _ctx.Ability.SetOnCooldown();
+            _ctx.Ability.SetOnCooldown(_ctx.AbilityLevel);
         }
     }
 }

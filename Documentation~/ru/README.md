@@ -122,3 +122,7 @@ bool started = _controller.TryActivateAbility(next, interruptCurrent: true);
 ## Для coding agents
 
 Для проектирования и реализации новых способностей используйте [руководство по разработке способностей](../AGENT_DEVELOPMENT_RU.md). [Runtime Agent API](../AGENT_API.md) предназначен для управления уже существующими способностями.
+
+## Дополнительные модули
+
+Подключаемые VFX/SFX, эффекты персонажей, дочерние объекты, повторение цикла и уровни навыков описаны в [руководстве Ability Modules](../ABILITY_MODULES_RU.md).
