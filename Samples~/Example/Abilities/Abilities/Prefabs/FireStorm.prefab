@@ -99,14 +99,15 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   config:
-    rid: 2714678346610639259
+    rid: 2714678359043342549
   references:
     version: 2
     RefIds:
-    - rid: 2714678346610639259
-      type: {class: AbilityObjectStrategyFactory, ns: LOGIYGames.Abilities, asm: LOGIYGames.Abilities}
+    - rid: 2714678359043342549
+      type: {class: AbilityProjectileStrategyFactory, ns: LOGIYGames.Abilities, asm: LOGIYGames.Abilities}
       data:
         LifeTime: 5
+        Speed: 10
 --- !u!1 &2796767512614464019
 GameObject:
   m_ObjectHideFlags: 0

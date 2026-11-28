@@ -15,6 +15,7 @@ namespace LOGIYGames.Abilities
         public Ability Ability;
         public AbilityTargetData TargetingData;
         public GameObject Caster;
+        public int CurrentIteration;
         public Transform CastOrigin;
     }
 }
