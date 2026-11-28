@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace LOGIYGames.Abilities
@@ -10,6 +11,16 @@ namespace LOGIYGames.Abilities
         public Sprite Icon;
         public string Description;
         [Min(0)] public float CooldownDuration = 0;
+
+        [Header("Ability Modules")]
+        [SerializeReference] public List<AbilityModuleFactory> Modules = new();
+
+        [Header("Ability Flow")]
+        [SerializeReference] public List<AbilityFlowModuleFactory> FlowModules = new();
+
+        [Header("Progression")]
+        [SerializeReference] public AbilityProgressionDefinition Progression = new();
+
         [Header("Strategy Factories")]
         [Header("Warmup")]
         [SerializeReference] public WarmupStrategyFactory Warmup = new WarmupStrategyFactory();
